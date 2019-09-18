@@ -4,19 +4,26 @@ import random
 
 PI = 3.141592653589793
 
-def draw_arrow(screen, start, end, color, width=1, head=10):
+def drawArrow(screen, start, end, color, width=1, head=10):
   pygame.draw.line(screen,color,start,end,width)
-  rotation = math.degrees(math.atan2(start[1]-end[1], end[0]-start[0]))+90
-  pygame.draw.polygon(screen, color, ((end[0]+head*math.sin(math.radians(rotation)), end[1]+head*math.cos(math.radians(rotation))), (end[0]+head*math.sin(math.radians(rotation-120)), end[1]+head*math.cos(math.radians(rotation-120))), (end[0]+head*math.sin(math.radians(rotation+120)), end[1]+head*math.cos(math.radians(rotation+120)))))
+  if head > 0:
+    rotation = math.degrees(math.atan2(start[1]-end[1], end[0]-start[0]))+90
+    pygame.draw.polygon(screen, color, 
+          ((end[0]+head*math.sin(math.radians(rotation)), 
+          end[1]+head*math.cos(math.radians(rotation))), 
+          (end[0]+head*math.sin(math.radians(rotation-120)), 
+          end[1]+head*math.cos(math.radians(rotation-120))), 
+          (end[0]+head*math.sin(math.radians(rotation+120)), 
+          end[1]+head*math.cos(math.radians(rotation+120)))))
 
 
 def drawComplex(screen, base, num, color):
-  draw_arrow(screen, (base.real, base.imag), (base.real+num.real, base.imag+num.imag), color, 2, 4)
+  drawArrow(screen, (base.real, base.imag), (base.real+num.real, base.imag+num.imag), color, 2, 4)
 
 def polar(r, phi):
-  return r * (math.cos(phi) + math.sin(phi)*1j)
+  return r * complex(math.cos(phi), math.sin(phi))
   
-def approximateCs(count, func, integration_steps=100):
+def approximateCoefficients(count, func, integration_steps=100):
   cs = []
   halfcount = int(count/2)
 
@@ -29,33 +36,31 @@ def approximateCs(count, func, integration_steps=100):
   return cs
 
 def example1(t):
-  return polar(25*math.sin(8*PI*t)+50, 2 * PI * t)
+  return polar(35*math.sin(16*PI*t)+75, 2 * PI * t)
+
+
+WINDOW_SIZE = (720, 720)
+TIMESCALE=0.1
 
 def main():
   successes, failures = pygame.init()
   print("{0} successes and {1} failures".format(successes, failures))
 
-  WINDOW_SIZE = (720, 720)
   screen = pygame.display.set_mode(WINDOW_SIZE)
   clock = pygame.time.Clock()
   FPS = 60  # Frames per second.
 
-  BLACK = (0, 0, 0)
-  WHITE = (255, 255, 255)
-
   root = complex(WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2)
 
-  cs = approximateCs(30, example1)
+  cs = approximateCoefficients(30, example1)
 
-  timescale=0.1
   t = 0.0
   path = []
   while True:
     dt = clock.tick(FPS) / 1000
-    if t < 1.0:
-      t += dt*timescale
+    t += dt * TIMESCALE
 
-    screen.fill(BLACK)
+    screen.fill((0,0,0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -70,13 +75,13 @@ def main():
     p = root
     for (i, c) in cs:
       n = c * polar(1.0, i * 2 * PI * t)
-      drawComplex(screen, p, n, (0, 0, 255))
+      drawComplex(screen, p, n, (0,255,255))
       p += n
 
     path.append(p)
     if len(path) >= 2:
       for i in range(len(path)-1):
-        pygame.draw.line(screen, WHITE, (path[i].real, path[i].imag), (path[i+1].real, path[i+1].imag), 3)
+        pygame.draw.line(screen, (0,255,0), (path[i].real, path[i].imag), (path[i+1].real, path[i+1].imag), 3)
     
     pygame.display.update()
 
