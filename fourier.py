@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 PI = 3.141592653589793
 
@@ -28,24 +29,32 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 root = complex(WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2)
+series_count=25
+halfcount = int(series_count/2)
 
+cs = [(i, complex(25*random.uniform(-1,1), random.uniform(-1,1))) for i in range(-halfcount, halfcount+1)]
+
+timescale=0.1
 t = 0.0
 while True:
     dt = clock.tick(FPS) / 1000
-    t += dt*0.1
+    if t < 1.0:
+      t += dt*timescale
 
     screen.fill(BLACK)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
           quit()
+        elif event.type == pygame.KEYDOWN:
+          if event.key == pygame.K_SPACE:
+            t = 0
 
     p = root
-    for i in range(-3, 3):
-      c = fromPolar(25.0, i * 2 * PI * t)
-      #print(c)
-      drawComplex(screen, p, c, WHITE)
-      p += c
+    for (i, c) in cs:
+      n = c * fromPolar(1.0, i * 2 * PI * t)
+      drawComplex(screen, p, n, WHITE)
+      p += n
     
     pygame.display.update()
 
