@@ -38,6 +38,10 @@ def approximateCoefficients(count, func, integration_steps=100):
 def example1(t):
   return polar(35*math.sin(16*PI*t)+75, 2 * PI * t)
 
+def example2(t):
+  return polar(35 if math.sin(16*PI*t)>0.5 else 70, 2 * PI * t)
+
+
 
 WINDOW_SIZE = (720, 720)
 TIMESCALE=0.1
@@ -52,7 +56,7 @@ def main():
 
   root = complex(WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2)
 
-  cs = approximateCoefficients(30, example1)
+  cs = approximateCoefficients(1000, example2, 5000)
 
   t = 0.0
   path = []
