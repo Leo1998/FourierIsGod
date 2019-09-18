@@ -29,7 +29,7 @@ def approximateCs(count, func, integration_steps=100):
   return cs
 
 def example1(t):
-  return polar(40*math.sin(2*PI*t)+50, 2 * PI * t)
+  return polar(25*math.sin(8*PI*t)+50, 2 * PI * t)
 
 def main():
   successes, failures = pygame.init()
@@ -49,6 +49,7 @@ def main():
 
   timescale=0.1
   t = 0.0
+  path = []
   while True:
     dt = clock.tick(FPS) / 1000
     if t < 1.0:
@@ -61,6 +62,7 @@ def main():
           quit()
         elif event.type == pygame.KEYDOWN:
           if event.key == pygame.K_SPACE:
+            path = []
             t = 0
           elif event.key == pygame.K_ESCAPE:
             quit()
@@ -68,8 +70,13 @@ def main():
     p = root
     for (i, c) in cs:
       n = c * polar(1.0, i * 2 * PI * t)
-      drawComplex(screen, p, n, WHITE)
+      drawComplex(screen, p, n, (0, 0, 255))
       p += n
+
+    path.append(p)
+    if len(path) >= 2:
+      for i in range(len(path)-1):
+        pygame.draw.line(screen, WHITE, (path[i].real, path[i].imag), (path[i+1].real, path[i+1].imag), 3)
     
     pygame.display.update()
 
