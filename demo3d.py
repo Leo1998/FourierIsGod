@@ -2,14 +2,23 @@ import math
 import pyglet
 from pyglet.gl import *
 
-from fourier import *
+PI = 3.141592653589793
 
 window = pyglet.window.Window()
 
+def example3d(t):
+  rad = 5
+  height = 14
+  f = 4
+
+  x = rad * math.sin(2 * PI * f * t)
+  y = height * t
+  z = rad * math.cos(2 * PI * f * t)
+  return [x, y, z]
 
 path = []
 t = 0
-timescale = 0.5
+timescale = 0.1
 
 @window.event
 def on_draw():
@@ -35,7 +44,6 @@ def update(dt):
   global t
   global path
 
-  #print(t)
   path.append(example3d(t))
   t += dt * timescale
   if t > 1.0:

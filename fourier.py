@@ -11,19 +11,15 @@ def example2(t):
   return polar(35 if math.sin(16*PI*t)>0.5 else 70, 2 * PI * t)
 
 
-def example3d(t):
-  rad = 5
-  height = 10
-  f = 5
-
-  x = rad * math.sin(2 * PI * f * t)
-  y = height * t
-  z = rad * math.cos(2 * PI * f * t)
-  return [x, y, z]
-
 
 def polar(r, phi):
   return r * complex(math.cos(phi), math.sin(phi))
+
+def fT(t, coeff):
+  y = complex(0, 0)
+  for (freq, coef) in coefficients:
+    y += coef * polar(1.0, freq * 2 * PI * t)
+  return y
 
 def approximateCoefficients(freq_range, func, integration_steps=100):
   cs = []
@@ -37,7 +33,14 @@ def approximateCoefficients(freq_range, func, integration_steps=100):
     cs.append((freq, integ))
   return cs
 
+'''def approximateCoefficientsMultiDim(freq_range, func, integration_steps=100):
+  dims = len(func(0))
+  result = []
 
+  for dim in range(dims-1):
+    f = lambda t: complex(func(t)[dim], func(t)[dim+1])
+    result.append(approximateCoefficients(freq_range, f, integration_steps=100))
+  return result'''
 
 
 
