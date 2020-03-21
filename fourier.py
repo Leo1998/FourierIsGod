@@ -1,40 +1,9 @@
-import pygame
 import math
-import random
+
 
 PI = 3.141592653589793
 
-def drawArrow(screen, start, end, color, width=1, head=10):
-  pygame.draw.line(screen,color,start,end,width)
-  if head > 0:
-    rotation = math.degrees(math.atan2(start[1]-end[1], end[0]-start[0]))+90
-    pygame.draw.polygon(screen, color, 
-          ((end[0]+head*math.sin(math.radians(rotation)), 
-          end[1]+head*math.cos(math.radians(rotation))), 
-          (end[0]+head*math.sin(math.radians(rotation-120)), 
-          end[1]+head*math.cos(math.radians(rotation-120))), 
-          (end[0]+head*math.sin(math.radians(rotation+120)), 
-          end[1]+head*math.cos(math.radians(rotation+120)))))
-
-
-def drawComplex(screen, base, num, color):
-  drawArrow(screen, (base.real, base.imag), (base.real+num.real, base.imag+num.imag), color, 2, 4)
-
-def polar(r, phi):
-  return r * complex(math.cos(phi), math.sin(phi))
-  
-def approximateCoefficients(count, func, integration_steps=100):
-  cs = []
-  halfcount = int(count/2)
-
-  for i in range(-halfcount, halfcount+1):
-    integ = complex(0.0, 0.0)
-    deltaT = 1.0 / integration_steps
-    for j in range(integration_steps):
-      integ += deltaT * func(j * deltaT) * polar(1.0, -i * 2 * PI * (j * deltaT))
-    cs.append((i, integ))
-  return cs
-
+# example functions
 def example1(t):
   return polar(35*math.sin(16*PI*t)+75, 2 * PI * t)
 
@@ -43,53 +12,24 @@ def example2(t):
 
 
 
-WINDOW_SIZE = (720, 720)
-TIMESCALE=0.1
 
-def main():
-  successes, failures = pygame.init()
-  print("{0} successes and {1} failures".format(successes, failures))
+def polar(r, phi):
+  return r * complex(math.cos(phi), math.sin(phi))
 
-  screen = pygame.display.set_mode(WINDOW_SIZE)
-  clock = pygame.time.Clock()
-  FPS = 60  # Frames per second.
+def approximateCoefficients(freq_range, func, integration_steps=100):
+  cs = []
+  half_freq = int(freq_range/2)
 
-  root = complex(WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2)
+  for freq in range(-half_freq , half_freq+1):
+    integ = complex(0.0, 0.0)
+    deltaT = 1.0 / integration_steps
+    for j in range(integration_steps):
+      integ += deltaT * func(j * deltaT) * polar(1.0, -freq * 2 * PI * (j * deltaT))
+    cs.append((freq, integ))
+  return cs
 
-  cs = approximateCoefficients(1000, example2, 5000)
 
-  t = 0.0
-  path = []
-  while True:
-    dt = clock.tick(FPS) / 1000
-    t += dt * TIMESCALE
 
-    screen.fill((0,0,0))
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-          quit()
-        elif event.type == pygame.KEYDOWN:
-          if event.key == pygame.K_SPACE:
-            path = []
-            t = 0
-          elif event.key == pygame.K_ESCAPE:
-            quit()
 
-    p = root
-    for (i, c) in cs:
-      n = c * polar(1.0, i * 2 * PI * t)
-      drawComplex(screen, p, n, (0,255,255))
-      p += n
 
-    path.append(p)
-    if len(path) >= 2:
-      for i in range(len(path)-1):
-        pygame.draw.line(screen, (0,255,0), (path[i].real, path[i].imag), (path[i+1].real, path[i+1].imag), 3)
-    
-    pygame.display.update()
-
-  print("Exited!")
-
-if __name__ == '__main__':
-  main()
