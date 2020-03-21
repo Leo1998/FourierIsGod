@@ -11,6 +11,15 @@ def example2(t):
   return polar(35 if math.sin(16*PI*t)>0.5 else 70, 2 * PI * t)
 
 
+def example3d(t):
+  rad = 5
+  height = 10
+  f = 5
+
+  x = rad * math.sin(2 * PI * f * t)
+  y = height * t
+  z = rad * math.cos(2 * PI * f * t)
+  return [x, y, z]
 
 
 def polar(r, phi):
